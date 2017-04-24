@@ -1,0 +1,18 @@
+k-means: I implemented from scratch the standard k-means algorithm (http://www.labri.fr/perso/bpinaud/userfiles/downloads/hartigan_1979_kmeans.pdf). To obtain
+the third point in the clustering section of my rubric I spent time trying to optimize the algorithm. For the k-means algorithm the primary method of optimizing
+the clusterings achieved is choosing an appropriate distance metric. I implemented functions to use Euclidean distance, manhattan distance, and pearson distance
+(the inverse of pearson correlation). I ran the k-means clustering with each of these distance metrics of several of the test portfolios I had available, and Manhattan distance
+appeared to give the most useful clusterings. When run with k=3, Manhattan distance clusterings gave us 3 clusters that in reality corresponded to 3 categories:
+"high returns, low dividend", "low returns, high dividend", and "middle returns, middle dividends". This sort of clustering would give the most useful information to users (investors)
+who are trying to develop a balanced portfolio.
+
+hierarchical: I used the scikit-learn implementation of hierarchical clustering due to the complexity of the algorithm and time constraints (as mentioned in the
+roadmap for the project). This allowed me to spend more time focusing on parameter tuning than I did for the k-means, which took signficant time to develop by itself. The first optimization
+decision was the choice of "linkage" function. I found that the "ward" linkage (which minimizes the variance of clusters being merged) provided much more useful clusterings for the
+test portfolios than the "average" (which uses average distance between clusters when merging) or "complete" (which uses maximum distance between clusters when merging), which both
+produced clusters that did not yield much information (at least on the surface) to users. The clusters made with the "ward" linkage created clusters that seemed to seperate based on industry
+(e.g. finance, tech, etc.) which then offered users details about which sectors had a high correlation with each others performance, a key factor in creating a balanced portfolio. Finally, a
+distance metric needed to be chosen in  the same way it was for k-means; however, the "ward" linkage requires the Euclidean distance to be used as the distance metric, and thus this
+was the only possible decision once 'ward' was chosen as the linkage function.
+
+(note: Euclidean distance will weight the yearly returns higher than the dividend equally (since they are both percentages), which is the expected behavior).
