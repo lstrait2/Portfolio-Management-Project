@@ -1,0 +1,3 @@
+Bootstrap for Index page: https://startbootstrap.com/template-overviews/1-col-portfolio/
+
+Bootstrap for Portfolio/Stock pages: https://startbootstrap.com/template-overviews/shop-item/
