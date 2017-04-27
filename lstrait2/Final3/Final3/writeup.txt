@@ -1,0 +1,43 @@
+k-means: I implemented from scratch the standard k-means algorithm (http://www.labri.fr/perso/bpinaud/userfiles/downloads/hartigan_1979_kmeans.pdf). To obtain
+the third point in the clustering section of my rubric I spent time trying to optimize the algorithm. For the k-means algorithm the primary method of optimizing
+the clusterings achieved is choosing an appropriate distance metric. I implemented functions to use Euclidean distance, manhattan distance, and pearson distance
+(the inverse of pearson correlation). I ran the k-means clustering with each of these distance metrics of several of the test portfolios I had available, and Manhattan distance
+appeared to give the most useful clusterings. When run with k=3, Manhattan distance clusterings gave us 3 clusters that in reality corresponded to 3 categories:
+"high returns, low dividend", "low returns, high dividend", and "middle returns, middle dividends". This sort of clustering would give the most useful information to users (investors)
+who are trying to develop a balanced portfolio.
+
+hierarchical: I used the scikit-learn implementation of hierarchical clustering due to the complexity of the algorithm and time constraints (as mentioned in the
+roadmap for the project). This allowed me to spend more time focusing on parameter tuning than I did for the k-means, which took signficant time to develop by itself. The first optimization
+decision was the choice of "linkage" function. I found that the "ward" linkage (which minimizes the variance of clusters being merged) provided much more useful clusterings for the
+test portfolios than the "average" (which uses average distance between clusters when merging) or "complete" (which uses maximum distance between clusters when merging), which both
+produced clusters that did not yield much information (at least on the surface) to users. The clusters made with the "ward" linkage created clusters that seemed to seperate based on industry
+(e.g. finance, tech, etc.) which then offered users details about which sectors had a high correlation with each others performance, a key factor in creating a balanced portfolio. Finally, a
+distance metric needed to be chosen in  the same way it was for k-means; however, the "ward" linkage requires the Euclidean distance to be used as the distance metric, and thus this
+was the only possible decision once 'ward' was chosen as the linkage function.
+
+(note: Euclidean distance will weight the yearly returns higher than the dividend equally (since they are both percentages), which is the expected behavior).
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+For both ML algorithms below I used dividend yield as the only feature, and the yearly price returns as the label (e.g. what we are trying to predict). Originally I also included
+change in yearly volume as a feature, but this created extremely poor results (<5% accuracy on the models). However, even when using only dividend yield as a feature, the accuracy results were
+quite poor (~10%) when the models were not overfitted. This is likely due to the fact that I do not have very much data at all, and dividend yield is not predictive of yearly returns
+in general.
+
+Decision Tree Regression: I used the scikit-learn implementation of decision tree regression as per the project outline. The first optimization decision that was made was to choose a max depth.
+I tried several depths, and got the best performance using a depth of 2. This intuitively makes sense, since we are only building the model with a single feature (dividend yield), the risk
+of over-fitting is very high if we allow the model to make many splits. When yearly volume was also included in the features, a max depth of 5 performed the highest for this very reason.
+The second optimization decision that needed to be made was choosing the minimum number of samples allowed in a leaf node. Since we had a very small amount of data (~300 samples), I chose the
+smallest number of samples in a leaf possible (1). This is because since we had such a small amount of data and a continuous label space, it is very likely that samples would nodes would not
+fall in the same leaf, that is the tree would be very sparse. I tried several runs with different values for this parameter, but 1 gave the best results by far. No other optimizations were explored,
+but future work would include adding more features, which is needed for this type of model to succeed.
+
+
+Support Vector Machine Regression: I again used the scikit-learn implemention of the support vector machine model, specifically the SVR library. When designing a support vector machine
+the main decision choice involves the choice of a kernel function. The three most common choices are linear, rbf, and polynomial. While polynomial kernels typically perform the best from
+the research I did, with the small amount of data (~300 samples) we have, a polynomial kernel would result in a massive degree of over-fitting. The experiments I ran indicated this, as
+the polynomial kernel gave ~100% accuracy on the training data, but only ~5% accuracy when a seperate testing set was removed. This is further compounded by the fact that we were only
+using a single feature - this was the primary reason the rbf kernel exhibitted enormous over-fitting as well. Therefore, given our limitations in our data, the linear kernel gave the best
+results by a large margin, although is not saying much given the poor quality of these models overall with a single weak feature like we had. The second optimization was the choice of C. A higher
+C means more overfitting, and thus I went with a relatively low C (100 vs. 1000 normally used) to prevent overfitting from completely ruining the model given our small data set. This by far
+gave the best performance when a seperate testing set was used.
